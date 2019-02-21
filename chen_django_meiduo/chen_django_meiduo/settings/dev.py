@@ -14,6 +14,8 @@ import os
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import datetime
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
@@ -42,6 +44,9 @@ INSTALLED_APPS = [
     # 注册DRF框架
     'rest_framework',
 
+    # 注册跨域访问支持
+    'corsheaders',
+
     # 注册应用
     'user',
 ]
@@ -57,6 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # 跨域访问支持中间件
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'chen_django_meiduo.urls'
@@ -138,18 +146,25 @@ STATIC_URL = '/static/'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://10.211.55.5:6379/0",
+        "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
     "session": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://10.211.55.5:6379/1",
+        "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
-    }
+    },
+    "verify_code": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"  # 修改Session机制，主要是给Admin站点使用
@@ -200,4 +215,46 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'chen_django_meiduo.utils.exceptions.my_exception_handler',
+
+    # jwt设置
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
 }
+
+# jwt设置
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+
+    # 自定义jwt返回数据
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler',
+}
+
+# 配置自定义的认证后端
+AUTHENTICATION_BACKENDS = [
+    'user.utils.UsernameMobileAuthBackend',
+]
+
+# 邮箱配置信息
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+# 发送邮件的邮箱
+EMAIL_HOST_USER = '13669825535@163.com'
+# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'chenyun123'
+# 收件人看到的发件人
+EMAIL_FROM = 'python<13669825535@163.com>'
+
+# 跨域访问白名单
+CORS_ORIGIN_WHITELIST = (
+        '127.0.0.1:8080',
+        'localhost:8080',
+        'www.meiduo.site:8080',
+        'api.meiduo.site:8000',
+)
+
+# 设置跨域访问中是否支持cookie的操作
+CORS_ALLOW_CREDENTIALS = True
