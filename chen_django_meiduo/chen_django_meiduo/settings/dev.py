@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     # 注册应用
     'user',
+    'areas',
 ]
 
 # 更改django认证系统，采用我们的认证
@@ -222,6 +223,12 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+}
+
+# drf拓展，缓存
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 60,  # 缓存时间，单位秒
+    'DEFAULT_USE_CACHE': 'default',			    # 缓存存储缓存到哪里 (redis)
 }
 
 # jwt设置

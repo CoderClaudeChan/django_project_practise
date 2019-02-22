@@ -1,0 +1,9 @@
+from rest_framework.routers import DefaultRouter
+
+from areas import views
+
+urlpatterns = []
+
+router = DefaultRouter()
+router.register(r'areas', views.AreaViewSet, base_name='areas')
+urlpatterns += router.urls
