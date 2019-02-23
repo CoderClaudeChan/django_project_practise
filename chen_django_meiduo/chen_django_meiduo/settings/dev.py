@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # 注册应用
     'user',
     'areas',
+    'goods',
 ]
 
 # 更改django认证系统，采用我们的认证
